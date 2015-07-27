@@ -7,8 +7,9 @@
   "description": "Subscribe to realtime NSE Scrips",
   "main": "subscribe-scrips.html",
   "keywords": [
-    "Spark",
-    "Lines"
+    "StockData",
+    "Nifty",
+    "Realtime"
   ],
   "license": "MIT",
   "homepage": "traderslab.in",

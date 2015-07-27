@@ -16,9 +16,25 @@
 	<link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
 	<!-- Web Components -->
 	<script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-	<link rel="import" href="spark-lines.html">
+	<script src="bower_components/long/dist/Long.min.js"></script>
+	<script src="bower_components/bytebuffer/dist/ByteBufferAB.min.js"></script>
+	<script src="bower_components/protobuf/dist/ProtoBuf.min.js"></script>
+	<script src="bower_components/q/q.js"></script>
+	<script src="bower_components/data-service/app/build/DataService.js"></script>
+	<link rel="import" href="bower_components/polymer/polymer.html">
+	<link rel="import" href="bower_components/tlab-data/tlab-data.html">
+	<link rel="import" href="subscribe-scrips.html">
 </head>
 <body unresolved>
-	<spark-lines></spark-lines>
+<template is="dom-bind">
+	<input type="text" value="{{scripToRegister::input}}"/>
+	<subscribe-scrips id="subscription" scrip="{{scripToRegister}}"></subscribe-scrips>
+	<script>
+		document.querySelector("#subscription").addEventListener('tick',function(data){
+			console.log('new data received ',data);
+		})
+	</script>
+</template>
+
 </body>
 </html>

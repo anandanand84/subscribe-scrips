@@ -1,73 +1,88 @@
-<dom-module id="spark-lines">
-  <link rel="import" href="../polymer/polymer.html">
-  <link rel="import" type="css" href="spark-lines.css">
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/tlab-data/tlab-data.html">
+<dom-module id="subscribe-scrips">
   <style>
     :host {
       display: block;
     }
   </style>
   <template>
-    <svg viewBox="0 0 100 40" width="50%" height="50%">
-      <path d="M 0 0, L 0 50, 100 50, 100 0,Z" />
-      Sorry, your browser does not support inline SVG.
-    </svg>
+    <div></div>
   </template>
   <script>
-    Polymer({
-      is: 'spark-lines',
+    var SubscribeScrips = Polymer({
+      is: "subscribe-scrips",
+      properties: {
+        /*value should be exchange:scrip*/
+        scrip: {
+          type: 'String',
+          observer: '_scripChanged'
+        },
 
-      data:{
-        type:Array,
-        value:[],
-        notify:true,
-        reflectToAtrribute:true,
-        observer: _dataChanged
+        registrationId: {
+          type: 'String',
+          readonly: true,
+        },
+
+        lastTick: {
+          type: Object,
+          value: function () {
+            return {}
+          },
+          notify: true,
+          reflectToAttribute: true
+        },
       },
 
-      path:{
-        type:Array,
-        value:[],
-        readonly:true
-      }
-
-      _dataChanged:function(data){
-
-      }
-
-      created: function() {
-        console.log(this.localName + '#' + this.id + ' was created');
+      _scripChanged: function () {
+        if (this.registrationId) {
+          this.unSubscribeScrips();
+          console.log('Un Subscribing Scrip');
+        }
+        console.log('Subscribing Scrip ',this.scrip);
+        var scripList = this.scrip.split(':');
+        if(scripList.length <= 1){
+          return;
+        }
+        var request = {
+          scrip: scripList[1],
+          exchange: scripList[0],
+          subscribe: true,
+        }
+        this.registrationId = this.dataService.subscribeForScrips(request, this._onScripData.bind(this))
       },
 
-      attached: function() {
-        console.log(this.localName + '#' + this.id + ' was attached');
+      _onScripData: function (topic, data) {
+        this.set('lastTick', data);
+        this.fire('tick',data);
       },
 
-      detached: function() {
-        console.log(this.localName + '#' + this.id + ' was detached');
+      unSubscribeScrips: function () {
+        var scripList = this.scrip.split(':');
+        var request = {
+          scrip: scripList[1],
+          exchange: scripList[0],
+          subscribe: false,
+        }
+        this.dataService.unSubscribeForScrips(request, this.registrationId)
+      },
+
+      created: function () {
+        this.dataService = DataService.getInstance();
       },
 
       ready: function() {
-        //on ready of the element
+        if(this.scrip && this.searchValue != null && this.searchValue != ''){
+          this._scripChanged(this.scrip);
+        }
       },
 
-      attributeChanged: function(name, type) {
-        console.log(this.localName + '#' + this.id + ' attribute ' + name +
-          ' was changed to ' + this.getAttribute(name));
+      attached: function () {
       },
 
-      properties: {
-
-      },
-
-      listeners: {
-        /*
-        'click': '_toggleHighlight'
-        'tap': 'regularTap',
-        'special.tap': 'specialTap'
-        */
-      },
-
-      //behaviors: [SuperBehavior]
+      getDataservice: function () {
+        return this.dataService;
+      }
     });
   </script>
 </dom-module>
